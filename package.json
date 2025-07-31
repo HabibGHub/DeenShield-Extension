@@ -1,0 +1,102 @@
+{
+  "name": "deen-shield",
+  "version": "1.1.0",
+  "description": "Professional Islamic content blocker helping Muslims maintain halal browsing habits - by Alhaq Digital Services",
+  "main": "background.js",
+  "scripts": {
+    "build": "npm run build:all",
+    "build:chrome": "node scripts/build-chrome.js",
+    "build:firefox": "node scripts/build-firefox.js",
+    "build:safari": "node scripts/build-safari.js",
+    "build:all": "node scripts/build-all.js",
+    "package": "npm run package:chrome && npm run package:firefox",
+    "package:chrome": "cd build/chrome && zip -r ../deen-shield-chrome-v1.0.0.zip .",
+    "package:firefox": "cd build/firefox && zip -r ../deen-shield-firefox-v1.0.0.zip .",
+    "lint": "web-ext lint --source-dir build/firefox",
+    "test:firefox": "web-ext run --source-dir build/firefox",
+    "validate": "npm run lint && npm run test:chrome",
+    "test:chrome": "echo 'Load build/chrome in chrome://extensions for testing'",
+    "clean": "rimraf build dist",
+    "dev": "npm run build && npm run test:firefox"
+  },
+  "keywords": [
+    "browser-extension",
+    "content-blocker",
+    "islamic",
+    "halal",
+    "muslim",
+    "deen",
+    "cross-browser",
+    "privacy",
+    "security",
+    "parental-control",
+    "alhaq-digital-services"
+  ],
+  "author": {
+    "name": "Alhaq Digital Services (ADS)",
+    "email": "support@alhaqds.software",
+    "url": "https://alhaqds.software"
+  },
+  "license": "MIT",
+  "homepage": "https://alhaqds.software",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alhaqds/deen-shield-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alhaqds/deen-shield-extension/issues"
+  },
+  "devDependencies": {
+    "web-ext": "^7.8.0",
+    "rimraf": "^5.0.0",
+    "archiver": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "browsers": {
+    "chrome": {
+      "manifest": "manifest.json",
+      "api": "chrome",
+      "min_version": "88"
+    },
+    "firefox": {
+      "manifest": "manifest-v2.json",
+      "api": "browser",
+      "min_version": "109"
+    },
+    "edge": {
+      "manifest": "manifest.json",
+      "api": "chrome",
+      "min_version": "88"
+    },
+    "safari": {
+      "manifest": "manifest.json",
+      "api": "safari",
+      "min_version": "14"
+    }
+  },
+  "webstore": {
+    "chrome": {
+      "app_id": "",
+      "publish": false
+    },
+    "firefox": {
+      "addon_id": "deen-shield@alhaqds.software",
+      "publish": false
+    },
+    "edge": {
+      "app_id": "",
+      "publish": false
+    }
+  },
+  "company": {
+    "name": "Alhaq Digital Services",
+    "abbreviation": "ADS",
+    "website": "https://alhaqds.software",
+    "contact_page": "https://alhaqds.software/contact",
+    "email": "info@alhaqds.software",
+    "support": "support@alhaqds.software"
+  }
+}
