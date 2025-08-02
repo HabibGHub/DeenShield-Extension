@@ -106,7 +106,7 @@ We may update this Privacy Policy to reflect changes in our practices or applica
 For questions about this Privacy Policy or our privacy practices:
 
 ### Privacy-Related Inquiries
-- **Email**: alhad.st@gmail.com
+- **Email**: support@alhaqds.software
 - **Support**: https://alhaqds.software/support
 
 ### Company Contact

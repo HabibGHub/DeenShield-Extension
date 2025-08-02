@@ -58,7 +58,7 @@ Search for "Deen Shield" in Edge Add-ons store
 ```
 
 ### Manual Installation (Developer Mode)
-1. Download the latest release from our [GitHub Releases](https://github.com/alhaqds/deen-shield-extension/releases)
+1. Download the latest release from our [GitHub Releases](https://github.com/HabibGHub/DeenShield-Extension/releases)
 2. Extract the ZIP file
 3. Open your browser's extension page
 4. Enable "Developer mode"
@@ -144,7 +144,7 @@ We welcome contributions from the Muslim developer community!
 ### Development Setup
 ```bash
 # Clone the repository
-git clone https://github.com/alhaqds/deen-shield-extension.git
+git clone https://github.com/HabibGHub/DeenShield-Extension.git
 cd deen-shield-extension
 
 # Install dependencies
@@ -181,8 +181,8 @@ If Deen Shield has helped you maintain better Islamic browsing habits:
 
 ### Technical Support
 - ?? **Email**: support@alhaqds.software
-- ?? **Bug Reports**: [GitHub Issues](https://github.com/alhaqds/deen-shield-extension/issues)
-- ?? **Feature Requests**: [GitHub Discussions](https://github.com/alhaqds/deen-shield-extension/discussions)
+- ?? **Bug Reports**: [GitHub Issues](https://github.com/HabibGHub/DeenShield-Extension/issues)
+- ?? **Feature Requests**: [GitHub Discussions](https://github.com/HabibGHub/DeenShield-Extension/discussions)
 
 ### Company Contact
 - ?? **Company**: Alhaq Digital Services (ADS)
@@ -246,6 +246,6 @@ This extension is developed by Alhaq Digital Services following Islamic principl
 
 Made with ?? by **Alhaq Digital Services (ADS)** for the Muslim Ummah
 
-[?? Website](https://alhaqds.software) � [?? Contact](https://alhaqds.software/contact) � [?? GitHub](https://github.com/alhaqds/deen-shield-extension)
+[?? Website](https://alhaqds.software) � [?? Contact](https://alhaqds.software/contact) � [?? GitHub](https://github.com/HabibGHub/DeenShield-Extension)
 
 </div>

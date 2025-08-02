@@ -40,10 +40,10 @@
   "homepage": "https://alhaqds.software",
   "repository": {
     "type": "git",
-    "url": "https://github.com/alhaqds/deen-shield-extension.git"
+    "url": "https://github.com/HabibGHub/DeenShield-Extension.git"
   },
   "bugs": {
-    "url": "https://github.com/alhaqds/deen-shield-extension/issues"
+    "url": "https://github.com/HabibGHub/DeenShield-Extension/issues"
   },
   "devDependencies": {
     "web-ext": "^7.8.0",

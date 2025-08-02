@@ -137,7 +137,7 @@ Join thousands of Muslims who have transformed their browsing experience with De
 - Website: https://alhaqds.software
 - Contact: https://alhaqds.software/contact
 - Support: support@alhaqds.software
-- Source Code: github.com/alhaqds/deen-shield-extension
+- Source Code: github.com/HabibGHub/DeenShield-Extension
 
 *May Allah accept this effort and make it beneficial for the Ummah. Ameen.*
 
