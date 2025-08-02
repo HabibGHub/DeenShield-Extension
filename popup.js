@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const unlockPasswordInput = document.getElementById('unlockPasswordInput');
     const unlockBtn = document.getElementById('unlockBtn');
     
+    // Save changes elements
+    const saveChangesBtn = document.getElementById('saveChangesBtn');
+    const unsavedIndicator = document.getElementById('unsavedIndicator');
+    const savingIndicator = document.getElementById('savingIndicator');
+    
     // Donate button elements
     const donateBtn = document.getElementById('donateBtn');
     const donateBtnLocked = document.getElementById('donateBtnLocked');
@@ -36,9 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const emergencyResetBtn = document.getElementById('emergencyResetBtn');
     const backToLoginBtn = document.getElementById('backToLoginBtn');
 
+    // Local state for pending changes
+    let pendingChanges = {};
     let customKeywords = [];
-        let haramKeywords = [];
-        let socialDomains = [];
+    let hasUnsavedChanges = false;
 
     // --- Load settings from storage ---
     browser.storage.sync.get(['settings'], (result) => {
@@ -60,48 +66,38 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleSecurityBtn.style.display = 'inline-block';
         }
 
+        // Load current settings into UI
         blockHaramToggle.checked = settings.blockHaram !== false;
         blockSocialToggle.checked = settings.blockSocial === true;
         customKeywords = settings.customKeywords || [];
-            haramKeywords = settings.haramKeywords || [
-                'porn', 'sex', 'xxx', 'adult', 'erotic', 'naked', 'lust', 'lewd',
-                'betting', 'casino', 'gambling', 'poker', 'roulette', 'slots',
-                'liquor', 'vodka', 'whiskey', 'beer', 'wine', 'alcohol',
-                'interest', 'riba', 'idol', 'statue', 'astrology', 'horoscope', 'pagan'
-            ];
-            socialDomains = settings.socialDomains || [
-                'facebook.com', 'twitter.com', 'instagram.com', 'tiktok.com', 'youtube.com',
-                'reddit.com', 'pinterest.com', 'linkedin.com', 'snapchat.com', 'discord.com'
-            ];
         renderKeywords();
+        
+        // Reset pending changes
+        pendingChanges = {};
+        hasUnsavedChanges = false;
+        updateSaveButton();
     });
 
-    // --- Event Listeners ---
-    blockHaramToggle.addEventListener('change', () => saveSetting('blockHaram', blockHaramToggle.checked));
-    blockSocialToggle.addEventListener('change', () => saveSetting('blockSocial', blockSocialToggle.checked));
+    // --- Event Listeners for Settings Changes ---
+    blockHaramToggle.addEventListener('change', () => {
+        pendingChanges.blockHaram = blockHaramToggle.checked;
+        markUnsavedChanges();
+    });
+    
+    blockSocialToggle.addEventListener('change', () => {
+        pendingChanges.blockSocial = blockSocialToggle.checked;
+        markUnsavedChanges();
+    });
 
     addKeywordBtn.addEventListener('click', addKeyword);
     keywordInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') addKeyword();
     });
-        const haramInput = document.getElementById('haramInput');
-        const addHaramBtn = document.getElementById('addHaramBtn');
-        const haramList = document.getElementById('haramList');
-        const socialInput = document.getElementById('socialInput');
-        const addSocialBtn = document.getElementById('addSocialBtn');
-        const socialList = document.getElementById('socialList');
-    
-        addHaramBtn.addEventListener('click', addHaramKeyword);
-        haramInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addHaramKeyword();
-        });
-    
-        addSocialBtn.addEventListener('click', addSocialDomain);
-        socialInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addSocialDomain();
-        });
 
-    // Password Setting
+    // Save Changes Button
+    saveChangesBtn.addEventListener('click', saveAllChanges);
+
+    // Password Setting (immediate save - these are security settings)
     setPasswordBtn.addEventListener('click', () => {
         const pass = passwordInput.value;
         if (pass) {
@@ -123,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Security Questions Setup
+    // Security Questions Setup (immediate save)
     if (toggleSecurityBtn) {
         toggleSecurityBtn.addEventListener('click', () => {
             securityQuestionsDiv.style.display = securityQuestionsDiv.style.display === 'none' ? 'block' : 'none';
@@ -159,6 +155,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 recoveryView.style.display = 'none';
                 unlockPasswordInput.value = '';
                 showMessage('Welcome back! Alhamdulillah.', 'success');
+                
+                // Reload settings after unlock
+                const settings = result.settings || {};
+                blockHaramToggle.checked = settings.blockHaram !== false;
+                blockSocialToggle.checked = settings.blockSocial === true;
+                customKeywords = settings.customKeywords || [];
+                renderKeywords();
+                pendingChanges = {};
+                hasUnsavedChanges = false;
+                updateSaveButton();
             } else {
                 showMessage('Incorrect password. Try again or use forgot password.', 'error');
                 unlockPasswordInput.value = '';
@@ -309,6 +315,59 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- New Functions for Save Changes Pattern ---
+    function markUnsavedChanges() {
+        hasUnsavedChanges = true;
+        updateSaveButton();
+    }
+
+    function updateSaveButton() {
+        if (hasUnsavedChanges) {
+            saveChangesBtn.disabled = false;
+            saveChangesBtn.textContent = '💾 Save Changes';
+            unsavedIndicator.style.display = 'block';
+        } else {
+            saveChangesBtn.disabled = true;
+            saveChangesBtn.textContent = '✓ All Changes Saved';
+            unsavedIndicator.style.display = 'none';
+        }
+        savingIndicator.style.display = 'none';
+    }
+
+    function saveAllChanges() {
+        if (!hasUnsavedChanges) return;
+        
+        // Show saving indicator
+        savingIndicator.style.display = 'block';
+        unsavedIndicator.style.display = 'none';
+        saveChangesBtn.disabled = true;
+        saveChangesBtn.textContent = '⏳ Saving...';
+        
+        // Get current settings and apply pending changes
+        browser.storage.sync.get(['settings'], (result) => {
+            const settings = result.settings || {};
+            
+            // Apply all pending changes
+            Object.keys(pendingChanges).forEach(key => {
+                settings[key] = pendingChanges[key];
+            });
+            
+            // Include custom keywords if they were modified
+            if (pendingChanges.customKeywords !== undefined) {
+                settings.customKeywords = customKeywords;
+            }
+            
+            // Save to storage
+            browser.storage.sync.set({ settings }, () => {
+                // Reset state
+                pendingChanges = {};
+                hasUnsavedChanges = false;
+                updateSaveButton();
+                showMessage('Changes saved successfully! Alhamdulillah.', 'success');
+            });
+        });
+    }
+
     // --- Functions ---
     function saveSetting(key, value) {
         browser.storage.sync.get(['settings'], (result) => {
@@ -317,94 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
             browser.storage.sync.set({ settings });
         });
     }
-    
-        function saveHaramKeywords() {
-            browser.storage.sync.get(['settings'], (result) => {
-                const settings = result.settings || {};
-                settings.haramKeywords = haramKeywords;
-                browser.storage.sync.set({ settings });
-            });
-        }
-    
-        function saveSocialDomains() {
-            browser.storage.sync.get(['settings'], (result) => {
-                const settings = result.settings || {};
-                settings.socialDomains = socialDomains;
-                browser.storage.sync.set({ settings });
-            });
-        }
-    
-        function renderHaramList() {
-            haramList.innerHTML = '';
-            haramKeywords.forEach((keyword, index) => {
-                const chip = document.createElement('div');
-                chip.className = 'chip';
-                chip.textContent = keyword;
-                const closeBtn = document.createElement('span');
-                closeBtn.className = 'close';
-                closeBtn.textContent = '×';
-                closeBtn.onclick = () => removeHaramKeyword(index);
-                chip.appendChild(closeBtn);
-                haramList.appendChild(chip);
-            });
-        }
-    
-        function addHaramKeyword() {
-            const keyword = haramInput.value.trim().toLowerCase();
-            if (keyword && !haramKeywords.includes(keyword)) {
-                haramKeywords.push(keyword);
-                saveHaramKeywords();
-                renderHaramList();
-                haramInput.value = '';
-                showMessage(`Keyword "${keyword}" added to haram list.`, 'success');
-            } else if (haramKeywords.includes(keyword)) {
-                showMessage('This keyword is already in your haram list.', 'warning');
-            }
-        }
-    
-        function removeHaramKeyword(index) {
-            const removedKeyword = haramKeywords[index];
-            haramKeywords.splice(index, 1);
-            saveHaramKeywords();
-            renderHaramList();
-            showMessage(`Keyword "${removedKeyword}" removed from haram list.`, 'info');
-        }
-    
-        function renderSocialList() {
-            socialList.innerHTML = '';
-            socialDomains.forEach((domain, index) => {
-                const chip = document.createElement('div');
-                chip.className = 'chip';
-                chip.textContent = domain;
-                const closeBtn = document.createElement('span');
-                closeBtn.className = 'close';
-                closeBtn.textContent = '×';
-                closeBtn.onclick = () => removeSocialDomain(index);
-                chip.appendChild(closeBtn);
-                socialList.appendChild(chip);
-            });
-        }
-    
-        function addSocialDomain() {
-            const domain = socialInput.value.trim().toLowerCase();
-            if (domain && !socialDomains.includes(domain)) {
-                socialDomains.push(domain);
-                saveSocialDomains();
-                renderSocialList();
-                socialInput.value = '';
-                showMessage(`Domain "${domain}" added to social media list.`, 'success');
-            } else if (socialDomains.includes(domain)) {
-                showMessage('This domain is already in your social media list.', 'warning');
-            }
-        }
-    
-        function removeSocialDomain(index) {
-            const removedDomain = socialDomains[index];
-            socialDomains.splice(index, 1);
-            saveSocialDomains();
-            renderSocialList();
-            showMessage(`Domain "${removedDomain}" removed from social media list.`, 'info');
-        }
 
     function showMessage(message, type = 'info') {
         // Create temporary message element
@@ -483,20 +454,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const keyword = keywordInput.value.trim().toLowerCase();
         if (keyword && !customKeywords.includes(keyword)) {
             customKeywords.push(keyword);
-            saveSetting('customKeywords', customKeywords);
-            renderKeywords();
             keywordInput.value = '';
-            showMessage(`Keyword "${keyword}" added to blocklist.`, 'success');
-        } else if (customKeywords.includes(keyword)) {
-            showMessage('This keyword is already in your blocklist.', 'warning');
+            renderKeywords();
+            pendingChanges.customKeywords = [...customKeywords];
+            markUnsavedChanges();
         }
     }
 
     function removeKeyword(index) {
-        const removedKeyword = customKeywords[index];
         customKeywords.splice(index, 1);
-        saveSetting('customKeywords', customKeywords);
         renderKeywords();
-        showMessage(`Keyword "${removedKeyword}" removed from blocklist.`, 'info');
+        pendingChanges.customKeywords = [...customKeywords];
+        markUnsavedChanges();
     }
-});
+}); // <-- This closes the DOMContentLoaded event listener

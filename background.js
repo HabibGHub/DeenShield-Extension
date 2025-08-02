@@ -49,20 +49,45 @@ const KEYWORD_CHUNK_SIZE = 10; // Number of keywords per rule to stay under memo
 let currentRuleIds = new Set();
 
 // --- Main Update Logic ---
-async function updateBlockingRules() {
-    getStorageSettings(async (settings) => {
-        const { blockHaram = true, blockSocial = false, customKeywords = [], haramKeywords, socialDomains } = settings;
-        const haramList = Array.isArray(haramKeywords) && haramKeywords.length > 0 ? haramKeywords : DEFAULT_HARAM_KEYWORDS;
-        const socialList = Array.isArray(socialDomains) && socialDomains.length > 0 ? socialDomains : DEFAULT_SOCIAL_MEDIA_DOMAINS;
+let updateLock = Promise.resolve();
+let updateQueued = false;
 
-        // Check if browser supports declarativeNetRequest (Chrome/Edge MV3)
-        if (browser.declarativeNetRequest && browser.declarativeNetRequest.updateDynamicRules) {
-            await updateDeclarativeNetRequestRules(blockHaram, blockSocial, customKeywords, haramList, socialList);
-        } else {
-            // Fallback to webRequest for Firefox and older browsers
-            updateWebRequestRules(blockHaram, blockSocial, customKeywords, haramList, socialList);
+async function updateBlockingRules() {
+    // If an update is already running, queue another run after it
+    if (updateLock && updateLock.isRunning) {
+        updateQueued = true;
+        return;
+    }
+    updateLock.isRunning = true;
+    updateLock = (async () => {
+        try {
+            await new Promise(resolve => {
+                getStorageSettings(async (settings) => {
+                    const { blockHaram = true, blockSocial = false, customKeywords = [], haramKeywords, socialDomains } = settings;
+                    const haramList = Array.isArray(haramKeywords) && haramKeywords.length > 0 ? haramKeywords : DEFAULT_HARAM_KEYWORDS;
+                    const socialList = Array.isArray(socialDomains) && socialDomains.length > 0 ? socialDomains : DEFAULT_SOCIAL_MEDIA_DOMAINS;
+
+                    // Check if browser supports declarativeNetRequest (Chrome/Edge MV3)
+                    if (browser.declarativeNetRequest && browser.declarativeNetRequest.updateDynamicRules) {
+                        await updateDeclarativeNetRequestRules(blockHaram, blockSocial, customKeywords, haramList, socialList);
+                    } else {
+                        // Fallback to webRequest for Firefox and older browsers
+                        updateWebRequestRules(blockHaram, blockSocial, customKeywords, haramList, socialList);
+                    }
+                    resolve();
+                });
+            });
+        } catch (e) {
+            console.error('Error in updateBlockingRules:', e);
+        } finally {
+            updateLock.isRunning = false;
+            if (updateQueued) {
+                updateQueued = false;
+                // Add a small delay before processing queued update to prevent rapid loops
+                setTimeout(updateBlockingRules, 100);
+            }
         }
-    });
+    })();
 }
 
 async function updateDeclarativeNetRequestRules(blockHaram, blockSocial, customKeywords, haramList, socialList) {
@@ -78,8 +103,11 @@ async function updateDeclarativeNetRequestRules(blockHaram, blockSocial, customK
         console.error("Error getting existing rules:", e);
     }
 
-    // Generate unique rule ID based on timestamp to avoid conflicts
-    let currentRuleId = RULE_ID_OFFSET + Date.now() % 1000;
+    // Always clear currentRuleIds at the start of each update
+    currentRuleIds.clear();
+
+    // Use a local incrementing ruleId for this update
+    let ruleId = RULE_ID_OFFSET;
 
     // --- KEYWORD RULES ---
     const finalKeywords = [];
@@ -94,13 +122,8 @@ async function updateDeclarativeNetRequestRules(blockHaram, blockSocial, customK
             const regexString = escapedKeywords.join('|');
 
             if (regexString) {
-                // Ensure unique rule ID
-                while (currentRuleIds.has(currentRuleId)) {
-                    currentRuleId++;
-                }
-                
                 rulesToAdd.push({
-                    id: currentRuleId,
+                    id: ruleId++,
                     priority: 1,
                     action: { type: 'block' },
                     condition: {
@@ -108,34 +131,36 @@ async function updateDeclarativeNetRequestRules(blockHaram, blockSocial, customK
                         resourceTypes: ['main_frame', 'sub_frame']
                     }
                 });
-                
-                currentRuleIds.add(currentRuleId);
-                currentRuleId++;
             }
         }
     }
 
     // --- DOMAIN RULES ---
-    const finalDomains = [];
-    if (blockSocial) finalDomains.push(...socialList);
+    let finalDomains = [];
+    if (blockSocial) {
+        socialList.forEach(domain => {
+            const base = domain.replace(/^www\./, '');
+            finalDomains.push(base);
+            finalDomains.push('www.' + base);
+        });
+    }
+    finalDomains = Array.from(new Set(finalDomains));
 
     if (finalDomains.length > 0) {
-        // Ensure unique rule ID
-        while (currentRuleIds.has(currentRuleId)) {
-            currentRuleId++;
-        }
-        
-        rulesToAdd.push({
-            id: currentRuleId,
-            priority: 1,
-            action: { type: 'block' },
-            condition: {
-                requestDomains: finalDomains,
-                resourceTypes: ['main_frame', 'sub_frame']
-            }
+        // Add rules for both http and https, www and non-www
+        ['http', 'https'].forEach(protocol => {
+            finalDomains.forEach(domain => {
+                rulesToAdd.push({
+                    id: ruleId++,
+                    priority: 1,
+                    action: { type: 'block' },
+                    condition: {
+                        urlFilter: `|${protocol}://${domain}`,
+                        resourceTypes: ['main_frame', 'sub_frame']
+                    }
+                });
+            });
         });
-        
-        currentRuleIds.add(currentRuleId);
     }
 
     // --- Update the rules ---
@@ -145,24 +170,37 @@ async function updateDeclarativeNetRequestRules(blockHaram, blockSocial, customK
             await browser.declarativeNetRequest.updateDynamicRules({
                 removeRuleIds: rulesToRemove
             });
+            // Poll until all rules are removed
+            let retries = 0;
+            let removed = false;
+            while (retries < 20 && !removed) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                const stillExisting = await browser.declarativeNetRequest.getDynamicRules();
+                removed = !stillExisting.some(rule => rulesToRemove.includes(rule.id));
+                retries++;
+            }
         }
-        
-        // Then add new rules
-        if (rulesToAdd.length > 0) {
+
+        // Fetch current rules to ensure no ID conflicts
+        const currentRules = await browser.declarativeNetRequest.getDynamicRules();
+        const currentIds = new Set(currentRules.map(r => r.id));
+        const uniqueRulesToAdd = rulesToAdd.filter(r => !currentIds.has(r.id));
+
+        // Now add only rules with unique IDs
+        if (uniqueRulesToAdd.length > 0) {
             await browser.declarativeNetRequest.updateDynamicRules({
-                addRules: rulesToAdd
+                addRules: uniqueRulesToAdd
             });
         }
-        
+
         console.log("Deen Shield rules updated successfully.", { 
-            added: rulesToAdd.length, 
+            added: uniqueRulesToAdd.length, 
             removed: rulesToRemove.length,
-            newRuleIds: rulesToAdd.map(r => r.id)
+            newRuleIds: uniqueRulesToAdd.map(r => r.id)
         });
     } catch (e) {
         console.error("Error updating dynamic rules:", e);
         console.error("Details:", JSON.stringify({ rulesToAdd, rulesToRemove }, null, 2));
-        
         // Clear our tracking on error
         currentRuleIds.clear();
     }

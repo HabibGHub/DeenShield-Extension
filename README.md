@@ -29,7 +29,6 @@ A comprehensive, cross-browser extension designed specifically for the Muslim co
 - ? **Chrome** (v88+)
 - ? **Microsoft Edge** (v88+)
 - ? **Firefox** (v109+)
-- ? **Safari** (v14+)
 - ? **Opera, Brave, Vivaldi** (Chromium-based)
 
 ### ?? **Professional Interface**
@@ -115,7 +114,6 @@ Settings automatically sync across all your devices when logged into the same br
 | Chrome | 88+ | V3 | ? Fully Supported |
 | Edge | 88+ | V3 | ? Fully Supported |
 | Firefox | 109+ | V2 | ? Fully Supported |
-| Safari | 14+ | WebExt | ? Supported |
 | Opera | Latest | V3 | ? Supported |
 | Brave | Latest | V3 | ? Supported |
 
@@ -196,16 +194,29 @@ If Deen Shield has helped you maintain better Islamic browsing habits:
 - ?? **Documentation**: Available on our website
 - ?? **Tutorials**: Coming soon on our platform
 
-## ?? Changelog
+## 📋 Changelog
 
-### Version 1.0.0 (January 2025)
-- ?? Initial release by Alhaq Digital Services
-- ? Cross-browser support (Chrome, Firefox, Edge, Safari)
-- ??? Haram content blocking
-- ?? Social media blocking
-- ?? Password protection
-- ?? Professional UI design
-- ?? Complete privacy protection
+### Version 1.2.0 (August 2, 2025)
+- 🛡️ **Save Changes Pattern**: Eliminated crashes from rapid toggling with batched settings updates
+- ⚡ **Enhanced Stability**: Robust error handling and race condition prevention
+- 🎨 **Improved UX**: Clear visual indicators for unsaved changes and saving status
+- 🔧 **Technical Improvements**: Fixed Chrome API unique ID errors and async handling
+- 🚀 **Performance**: Optimized background script execution and memory usage
+
+### Version 1.1.0 (July 25, 2025)
+- 🌐 **Cross-Browser Enhancement**: Improved compatibility across all supported browsers
+- 🔒 **Advanced Blocking Logic**: Enhanced domain matching and keyword filtering
+- 🔧 **Bug Fixes**: Resolved toggle state inconsistencies and storage sync issues
+- 📱 **UI Refinements**: Polished interface elements and responsive design improvements
+
+### Version 1.0.0 (July 20, 2025) - **Initial Release**
+- 🎉 **First Public Release**: Professional launch by Alhaq Digital Services
+- 🌍 **Cross-Browser Support**: Chrome, Firefox, Edge compatibility
+- 🛡️ **Haram Content Blocking**: Comprehensive inappropriate content filtering
+- 📱 **Social Media Control**: Optional blocking of major social platforms
+- 🔐 **Password Protection**: Secure settings with authentication system
+- 🎨 **Professional UI**: Clean, Islamic-themed interface design
+- 🔒 **Privacy First**: Complete local storage with zero data collection
 
 ## ?? Islamic Compliance
 
@@ -235,6 +246,6 @@ This extension is developed by Alhaq Digital Services following Islamic principl
 
 Made with ?? by **Alhaq Digital Services (ADS)** for the Muslim Ummah
 
-[?? Website](https://alhaqds.software) � [?? Contact](https://alhaqds.software/contact) � [?? GitHub](https://github.com/alhaqds/deen-shield-extension)
+[?? Website](https://alhaqds.software) � [?? Contact](https://alhaqds.software/contact) � [?? GitHub](https://github.com/alhaqds/deen-shield-extension)
 
 </div>

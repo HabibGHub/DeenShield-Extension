@@ -53,22 +53,9 @@ function buildFirefox() {
   console.log('Firefox build complete:', buildDir);
 }
 
-function buildSafari() {
-  const buildDir = path.join('build', 'safari');
-  if (fs.existsSync(buildDir)) fs.rmSync(buildDir, { recursive: true, force: true });
-  fs.mkdirSync(buildDir, { recursive: true });
-  ['manifest.json', 'popup.html', 'popup.js', 'background.js', 'polyfill.js', 'safari-content.js'].forEach(f => {
-    if (fs.existsSync(f)) copyFileSync(f, buildDir);
-  });
-  if (fs.existsSync('images')) copyFolderRecursiveSync('images', path.join(buildDir, 'images'));
-  console.log('Safari build complete:', buildDir);
-}
-
 console.log('Building Deen Shield for all browsers...');
 buildChrome();
 buildFirefox();
-buildSafari();
 console.log('All builds complete!');
 console.log('- Chrome/Edge: build/chrome/');
 console.log('- Firefox: build/firefox/');
-console.log('- Safari: build/safari/');

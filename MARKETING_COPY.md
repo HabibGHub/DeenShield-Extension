@@ -1,4 +1,4 @@
-# Web Store Marketing Copy
+# Web Store Marketing C🌐 **Cross-Browser Support** - Works on Chrome, Firefox, and Edgepy
 
 ## ?? Chrome Web Store Listing
 
@@ -101,7 +101,7 @@ A comprehensive, privacy-first content blocking solution designed specifically f
 - No external data transmission
 
 ?? **Cross-Browser Compatibility**
-- Works on Firefox, Chrome, Edge, Safari
+- Works on Firefox, Chrome, Edge
 - Consistent experience across devices
 - Sync settings across browsers
 
@@ -315,3 +315,26 @@ The Alhaq Digital Services Team
 - Highlight Islamic business credentials
 - Show commitment to privacy and ethics
 - Demonstrate community focus
+
+## 📅 **Release History**
+
+### Version 1.2.0 (August 2, 2025) - **Latest Stable Release**
+- Enhanced stability with save changes pattern
+- Race condition prevention and improved error handling
+- Professional UX improvements with visual feedback
+- Optimized performance and Chrome API compatibility
+
+### Version 1.1.0 (July 25, 2025) - **Cross-Browser Enhancement**
+- Improved compatibility across all supported browsers
+- Advanced blocking logic with enhanced domain matching
+- UI refinements and responsive design improvements
+- Bug fixes for toggle states and storage synchronization
+
+### Version 1.0.0 (July 20, 2025) - **Professional Launch**
+- **First public release** by Alhaq Digital Services
+- Comprehensive Islamic content blocking system
+- Cross-browser support (Chrome, Firefox, Edge)
+- Professional UI with Islamic design principles
+- Complete privacy protection with local-only storage
+- Password protection and security features
+- Foundation for serving the global Muslim community

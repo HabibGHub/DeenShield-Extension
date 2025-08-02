@@ -242,42 +242,68 @@
             margin-top: 8px;
             font-style: italic;
         }
+        .save-container {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            border-top: 1px solid #ddd;
+            padding: 12px;
+            margin: -8px -8px 0 -8px;
+            border-radius: 0 0 8px 8px;
+        }
+        .save-button {
+            width: 100%;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0;
+        }
+        .save-button:hover {
+            background-color: #218838;
+        }
+        .save-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .unsaved-indicator {
+            color: #dc3545;
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .saving-indicator {
+            color: #ffc107;
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div id="settings-view">
         <div class="card">
-            <h2>Halal Browse Filters</h2>
+            <h2>Content Blocking</h2>
             <div class="switch-container">
-                <div>
-                    <strong>Impermissible Content</strong><br>
-                    <small>Blocks haram content & keywords.</small>
-                </div>
+                <span><strong>Block Impermissible Content</strong></span>
                 <label class="switch">
                     <input type="checkbox" id="blockHaram">
                     <span class="slider"></span>
                 </label>
             </div>
-            <div class="input-group">
-                <input type="text" id="haramInput" placeholder="Add haram keyword...">
-                <button id="addHaramBtn">Add</button>
-            </div>
-            <div id="haramList"></div>
             <div class="switch-container">
-                <div>
-                    <strong>Social Media</strong><br>
-                    <small>Helps lower the gaze.</small>
-                </div>
+                <span><strong>Block Social Media</strong></span>
                 <label class="switch">
                     <input type="checkbox" id="blockSocial">
                     <span class="slider"></span>
                 </label>
             </div>
-            <div class="input-group">
-                <input type="text" id="socialInput" placeholder="Add social media domain...">
-                <button id="addSocialBtn">Add</button>
-            </div>
-            <div id="socialList"></div>
         </div>
         <div class="card">
             <h2>Custom Blocklist</h2>
@@ -328,6 +354,19 @@
             </div>
             <button class="donate-button" id="donateBtn">💝 Donate (Sadaqah)</button>
             <div class="sadaqah-text">"The believer's shade on the Day of Resurrection will be his charity" - Hadith</div>
+        </div>
+        
+        <!-- Save Changes Container -->
+        <div class="save-container">
+            <div id="unsavedIndicator" class="unsaved-indicator" style="display: none;">
+                ⚠️ You have unsaved changes
+            </div>
+            <div id="savingIndicator" class="saving-indicator" style="display: none;">
+                ⏳ Saving changes...
+            </div>
+            <button id="saveChangesBtn" class="save-button" disabled>
+                💾 Save Changes
+            </button>
         </div>
     </div>
     

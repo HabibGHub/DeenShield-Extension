@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Deen Shield - Islamic Content Blocker",
   "short_name": "Deen Shield",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Islamic content blocker helping Muslims maintain halal browsing. Block inappropriate content & social media with privacy.",
   "author": "Alhaq Digital Services (ADS)",
   "homepage_url": "https://alhaqds.software",
@@ -13,7 +13,26 @@
     "tabs"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "https://facebook.com/*",
+    "https://www.facebook.com/*",
+    "https://twitter.com/*",
+    "https://www.twitter.com/*",
+    "https://instagram.com/*",
+    "https://www.instagram.com/*",
+    "https://tiktok.com/*",
+    "https://www.tiktok.com/*",
+    "https://youtube.com/*",
+    "https://www.youtube.com/*",
+    "https://reddit.com/*",
+    "https://www.reddit.com/*",
+    "https://pinterest.com/*",
+    "https://www.pinterest.com/*",
+    "https://linkedin.com/*",
+    "https://www.linkedin.com/*",
+    "https://snapchat.com/*",
+    "https://www.snapchat.com/*",
+    "https://discord.com/*",
+    "https://www.discord.com/*"
   ],
   "background": {
     "service_worker": "background.js"

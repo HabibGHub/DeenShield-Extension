@@ -52,67 +52,113 @@ let currentFilters = {
     customKeywords: []
 };
 
+// Lock to prevent overlapping updates
+let updateLock = Promise.resolve();
+let updateQueued = false;
+
 function updateWebRequestRules() {
-    getStorageSettings((settings) => {
-        const { blockHaram = true, blockSocial = false, customKeywords = [] } = settings;
-        currentFilters = { blockHaram, blockSocial, customKeywords };
+    // If an update is already running, queue another run after it
+    if (updateLock && updateLock.isRunning) {
+        updateQueued = true;
+        return;
+    }
+    updateLock.isRunning = true;
+    updateLock = (async () => {
+        try {
+            await new Promise(resolve => {
+                getStorageSettings((settings) => {
+                    const { blockHaram = true, blockSocial = false, customKeywords = [], socialDomains } = settings;
+                    // Use user-saved socialDomains if present, else default
+                    const socialList = Array.isArray(socialDomains) && socialDomains.length > 0 ? socialDomains : SOCIAL_MEDIA_DOMAINS;
+                    currentFilters = { blockHaram, blockSocial, customKeywords, socialList };
 
-        // Remove existing listeners (cross-browser)
-        if (browser.webRequest && browser.webRequest.onBeforeRequest && browser.webRequest.onBeforeRequest.hasListener && browser.webRequest.onBeforeRequest.removeListener) {
-            if (browser.webRequest.onBeforeRequest.hasListener(blockRequestHandler)) {
-                browser.webRequest.onBeforeRequest.removeListener(blockRequestHandler);
+                    // Remove existing listeners (cross-browser)
+                    try {
+                        if (browser.webRequest && browser.webRequest.onBeforeRequest && browser.webRequest.onBeforeRequest.hasListener && browser.webRequest.onBeforeRequest.removeListener) {
+                            if (browser.webRequest.onBeforeRequest.hasListener(blockRequestHandler)) {
+                                browser.webRequest.onBeforeRequest.removeListener(blockRequestHandler);
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Error removing webRequest listener:', e);
+                    }
+
+                    // Add new listener if any blocking is enabled
+                    if ((blockHaram || blockSocial || (customKeywords && customKeywords.length > 0)) && browser.webRequest && browser.webRequest.onBeforeRequest && browser.webRequest.onBeforeRequest.addListener) {
+                        try {
+                            browser.webRequest.onBeforeRequest.addListener(
+                                blockRequestHandler,
+                                { urls: ["<all_urls>"] },
+                                ["blocking"]
+                            );
+                        } catch (e) {
+                            console.warn('Error adding webRequest listener:', e);
+                        }
+                    }
+                    console.log("Deen Shield webRequest rules updated.", currentFilters);
+                    resolve();
+                });
+            });
+        } catch (e) {
+            console.error('Error in updateWebRequestRules:', e);
+        } finally {
+            updateLock.isRunning = false;
+            if (updateQueued) {
+                updateQueued = false;
+                // Add a small delay before processing queued update to prevent rapid loops
+                setTimeout(updateWebRequestRules, 100);
             }
         }
-
-        // Add new listener if any blocking is enabled
-        if ((blockHaram || blockSocial || (customKeywords && customKeywords.length > 0)) && browser.webRequest && browser.webRequest.onBeforeRequest && browser.webRequest.onBeforeRequest.addListener) {
-            try {
-                browser.webRequest.onBeforeRequest.addListener(
-                    blockRequestHandler,
-                    { urls: ["<all_urls>"] },
-                    ["blocking"]
-                );
-            } catch (e) {
-                // Some browsers may throw if already added
-            }
-        }
-        console.log("Deen Shield webRequest rules updated.", currentFilters);
-    });
+    })();
 }
 
 function blockRequestHandler(details) {
     const url = details.url.toLowerCase();
-    
+    let shouldBlock = false;
+    const haramList = HARAM_KEYWORDS;
+    const socialList = currentFilters.socialList || SOCIAL_MEDIA_DOMAINS;
+
     // Check social media domains
     if (currentFilters.blockSocial) {
-        for (const domain of SOCIAL_MEDIA_DOMAINS) {
+        for (const domain of socialList) {
             if (url.includes(domain)) {
-                console.log("Blocked social media:", url);
-                return { cancel: true };
+                shouldBlock = true;
+                break;
             }
         }
     }
-    
+
     // Check haram keywords
-    if (currentFilters.blockHaram) {
-        for (const keyword of HARAM_KEYWORDS) {
+    if (!shouldBlock && currentFilters.blockHaram) {
+        for (const keyword of haramList) {
             if (url.includes(keyword)) {
-                console.log("Blocked haram content:", url);
-                return { cancel: true };
+                shouldBlock = true;
+                break;
             }
         }
     }
-    
+
     // Check custom keywords
-    if (currentFilters.customKeywords && currentFilters.customKeywords.length > 0) {
+    if (!shouldBlock && currentFilters.customKeywords && currentFilters.customKeywords.length > 0) {
         for (const keyword of currentFilters.customKeywords) {
             if (url.includes(keyword.toLowerCase())) {
-                console.log("Blocked custom keyword:", url);
-                return { cancel: true };
+                shouldBlock = true;
+                break;
             }
         }
     }
-    
+
+    if (shouldBlock) {
+        // Try to redirect to block.html (must be web_accessible_resource in manifest)
+        const redirectUrl = browser.runtime.getURL ? browser.runtime.getURL('block.html') : (chrome && chrome.runtime && chrome.runtime.getURL ? chrome.runtime.getURL('block.html') : null);
+        if (redirectUrl && details.type === 'main_frame') {
+            console.log('Redirecting to block page:', redirectUrl);
+            return { redirectUrl };
+        } else {
+            console.log('Blocked (cancelled):', url);
+            return { cancel: true };
+        }
+    }
     return {};
 }
 

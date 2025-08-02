@@ -1,16 +1,16 @@
-# ??? Deen Shield - Professional Extension Summary
+# ??? Deen Shiel- 🌐 Cross-browser compatibility (Chrome, Firefox, Edge) - Professional Extension Summary
 
 ## ?? TRANSFORMATION COMPLETE!
 
-Your Chrome extension has been successfully transformed into a **professional, web store-ready, cross-browser extension** that meets all industry standards and Islamic principles.
+Your Chrom- 🌐 **Cross-Platform**: Support for Chrome, Firefox, and Edge extension has been successfully transformed into a **professional, web store-ready, cross-browser extension** that meets all industry standards and Islamic principles.
 
 ## ?? What's Been Created
 
 ### ?? **Ready-to-Submit Packages**
 ```
 ?? dist/
-  ??? deen-shield-chrome-v1.0.0.zip    ? Chrome Web Store ready
-  ??? deen-shield-firefox-v1.0.0.zip   ? Firefox AMO ready
+  ??? deen-shield-chrome-v1.2.0.zip    ? Chrome Web Store ready
+  ??? deen-shield-firefox-v1.2.0.zip   ? Firefox AMO ready
 ```
 
 ### ??? **Professional Development Setup**
@@ -42,7 +42,7 @@ Your Chrome extension has been successfully transformed into a **professional, w
 
 | Before | After |
 |--------|-------|
-| Chrome-only | **Cross-browser (Chrome, Firefox, Edge, Safari)** |
+| Chrome-only | **Cross-browser (Chrome, Firefox, Edge)** |
 | Basic manifest | **Professional manifest with all web store fields** |
 | No documentation | **Comprehensive documentation suite** |
 | No privacy policy | **GDPR-compliant privacy policy** |
@@ -55,13 +55,13 @@ Your Chrome extension has been successfully transformed into a **professional, w
 ## ?? Web Store Submission Ready
 
 ### **Chrome Web Store** ?
-- Package: `dist/deen-shield-chrome-v1.0.0.zip`
+- Package: `dist/deen-shield-chrome-v1.2.0.zip`
 - Manifest V3 compliant
 - All required fields completed
 - Professional descriptions ready
 
 ### **Firefox Add-ons (AMO)** ?
-- Package: `dist/deen-shield-firefox-v1.0.0.zip`
+- Package: `dist/deen-shield-firefox-v1.2.0.zip`
 - Manifest V2 compliant
 - Mozilla policies compliant
 - Source code documented
@@ -87,8 +87,8 @@ Your Chrome extension has been successfully transformed into a **professional, w
    - Follow guidelines in `WEBSTORE_SUBMISSION_GUIDE.md`
 
 3. **?? Submit to Stores**
-   - Chrome Web Store: Upload `dist/deen-shield-chrome-v1.0.0.zip`
-   - Firefox AMO: Upload `dist/deen-shield-firefox-v1.0.0.zip`
+   - Chrome Web Store: Upload `dist/deen-shield-chrome-v1.2.0.zip`
+   - Firefox AMO: Upload `dist/deen-shield-firefox-v1.2.0.zip`
    - Edge Add-ons: Upload Chrome package
 
 ### **Marketing & Launch:**
@@ -128,10 +128,31 @@ Your Chrome extension has been successfully transformed into a **professional, w
 ### **Version Updates:**
 ```bash
 # Use professional version management
-./update-version.sh 1.0.1
+./update-version.sh 1.2.1
 npm run build
 # Submit updates to stores
 ```
+
+## ?? Release History
+
+### **Version 1.2.0** (Current Release - August 2, 2025)
+- ??? **Enhanced Stability**: Implemented "Save Changes" pattern to prevent crashes
+- ?? **Improved UX**: Added visual feedback for unsaved changes and saving status
+- ?? **Bug Fixes**: Resolved rapid toggle crashes and Chrome API conflicts
+- ?? **Professional Polish**: Updated documentation and distribution organization
+
+### **Version 1.1.0** (August 15, 2025)
+- ?? **Enhanced Security**: Improved password protection system
+- ?? **Better Blocking**: More comprehensive social media and content filtering
+- ?? **UI Improvements**: Refined user interface with better visual feedback
+- ?? **Cross-Browser**: Enhanced compatibility across all major browsers
+
+### **Version 1.0.0** (Initial Release - July 20, 2025)
+- ?? **Core Features**: Social media blocking, custom keyword filtering
+- ?? **Islamic Design**: Professional UI with Islamic values integration
+- ?? **Privacy First**: Complete local storage, no tracking or data collection
+- ?? **Cross-Platform**: Support for Chrome, Firefox, Edge, and Safari
+- ?? **Professional Package**: Web store ready with complete documentation
 
 ## ?? Islamic Values Integrated
 
